@@ -9,8 +9,8 @@ from adafruit_hid.keycode import Keycode
 
 from adafruit_httpserver import Request, Response, Server
 
-
 print("creating AP")
+hello("text")
 time.sleep(3)
 wifi.radio.start_ap(ssid="test", password="12345678")
 
