@@ -35,7 +35,7 @@ def attack_mode():
                 key = dictionary[x]
                 #print(key)
                 
-                kbd.press(key)
+                #kbd.press(key)
                 print("pressing")
 
 
@@ -44,12 +44,12 @@ def attack_mode():
             print("keys released")
 
         elif "[" and "]" in i:
-            layout.write(i[1:-1])
+            #layout.write(i[1:-1])
             print("writing")
 
         else:
             key = dictionary[i]
-            kbd.send(key)
+            #kbd.send(key)
             
 
 
