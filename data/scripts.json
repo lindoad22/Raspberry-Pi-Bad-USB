@@ -1,6 +1,10 @@
 {
     "1": {
         "name": "test script",
-        "script": "WIN+R,[cmd],ENTER"
-    } 
+        "script": "WIN+R,[cmd],ENTER,WAIT1,[nc -lvnp 444]"
+    },
+    "2": {
+        "name": "second script",
+        "script": "WIN+R,[notepad],ENTER,WAIT0.5,[Hello]"
+    }
 }

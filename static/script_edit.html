@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Script Edit</title>
 </head>
 <body>
-    <div>
+    <div id="menu">
+        <a href="/">Settings</a>
+        <a href="/logbook">logbook</a>
+    </div>
+
+    <div id="wrapper">
         <div id="script_list">
-            <div class="list_item">script number</div>
+            {list_item}
         </div>
         
         <div id="edit_script">
-            <form method="POST">
+            <form method="POST" enctype="text/plain">
                 <textarea name="script" id="textarea_script">{script}</textarea>
                 
                 <button type="submit">send</button>
