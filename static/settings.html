@@ -7,51 +7,59 @@
     </head>
 
     <body>
-        <div id="menu">
-            <a href="/script_edit">edit scripts</a>
-            <a href="/logbook">see logs</a>
+
+        <div id="wrapper"> 
+            <div id="menu">
+                <a href="/script_edit">edit scripts</a>
+                <a href="/logbook">see logs</a>
+            </div>
+            <div class="card">
+
+                <form method="POST" enctype="text/plain">
+                    <div id="network_settings">
+                        
+
+                        <h2>Network settings</h2>
+                        <div class="input_field">
+                            <label for="ssid">SSID</label>
+                        <input name="ssid" type="text" placeholder="" value="{ssid_value}">
+                        </div>
+                        
+                        <div class="input_field">
+                            <label for="wifi_password">WiFi password</label>
+                            <input name="wifi_password" type="text" placeholder="" value="{wifi_password_value}">
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+
+                    <div id="user_settings">
+
+                        <h2>User settings</h2>
+                        <div class="input_field">
+                            <label for="username">Login username</label>
+                            <input name="username" type="text" placeholder="" value="{login_username}">
+                        </div>
+
+                        <div class="input_field">
+                            <label for="login_password">New login password</label>
+                            <input name="login_password" type="text" placeholder="" value="">
+                        </div>
+                        
+                        <div class="input_field">
+                            <label for="confirm_password">Confirm new password</label>
+                            <input name="confirm_password" type="text" placeholder="" value="">
+                        </div>  
+                        
+                        <div class="input_field button_div">
+                            <button type="submit">Send</button>
+                        </div>
+                    
+                    </div>
+                </form>
+
+                {message}
+            </div>
         </div>
-        <div>
-
-            <form method="POST" enctype="text/plain">
-                <div id="networkSettings">
-                    
-
-                    <h2>Network settings</h2>
-                    <div class="input_field">
-                        <label for="ssid">SSID</label>
-                    <input name="ssid" type="text" placeholder="" value="{ssid_value}">
-                    </div>
-                    
-                    <div class="input_field">
-                        <label for="wifi_password">WiFi password</label>
-                        <input name="wifi_password" type="text" placeholder="" value="{wifi_password_value}">
-                    </div>
-
-                    <h2>User settings</h2>
-                    <div class="input_field">
-                        <label for="username">Login username</label>
-                        <input name="username" type="text" placeholder="" value="{login_username}">
-                    </div>
-
-                    <div class="input_field">
-                        <label for="login_password">New login password</label>
-                        <input name="login_password" type="text" placeholder="" value="">
-                    </div>
-                    
-                    <div class="input_field">
-                        <label for="confirm_password">Confirm new password</label>
-                        <input name="confirm_password" type="text" placeholder="" value="">
-                    </div>  
-                    
-                    <div class="input_field">
-                        <button type="submit">Send</button>
-                    </div>
-                
-                </div>
-            </form>
-        </div>
-        
 
     </body>
 </html>

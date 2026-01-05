@@ -7,11 +7,22 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="menu">
-        <a href="/">Settings</a>
-        <a href="/script_edit">Edit scripts</a>
-    </div>
+    <div id="wrapper">
 
-    <div id="logs">{logbook_item}</div>
+        <div id="menu">
+            <a href="/">Settings</a>
+            <a href="/script_edit">Edit scripts</a>
+        </div>
+    
+        <div id="logs">
+            <div class="log_item">
+                <div class="cell">ID</div>
+                <div class="cell">Status</div>
+                <div class="cell">Reason</div>
+                <div class="cell">Script name</div>
+            </div>
+            {logbook_item}
+        </div>
+    </div>
 </body>
 </html>

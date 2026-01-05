@@ -1,9 +1,8 @@
 * {
     box-sizing: border-box;
-}
-#wrapper {
-    display: flex;
-    gap: 5px;
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
 }
 
 .log_item {
@@ -15,4 +14,103 @@
 .cell {
     margin: 0;
     padding: 0;
+    min-width: 55px;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+#login_form {
+    align-self: center;
+    padding: 12px 24px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #939393;
+}
+
+#login_form form{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+}
+
+.button_div {
+    display: flex;
+    justify-content: center;
+    
+}
+.divider {
+    height: 1px;
+    width: 100%;
+    border-bottom: 1px solid;
+}
+
+#wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-top: 12px;
+
+    padding: 12px;
+    border-radius: 10px;
+    min-width: 200px;
+}
+
+#menu a, .button_div button{
+    padding: 6px 12px;
+    border-radius: 2px;
+    background-color: #d7d7d7;
+
+    
+    text-decoration: none;
+    color: black;
+    
+}
+
+.button_div button {
+
+    border: none
+}
+
+.button_div button:hover{
+    cursor: pointer;
+
+}
+
+#menu {
+    border-bottom: 1px solid;
+    display: flex;
+    gap: 6px;
+
+    padding: 6px 12px;
+}
+
+#script_card {
+    display: flex;
+    gap: 6px;
+
+}
+
+textarea {
+    max-width: 400px;
+    min-width: 200px;
+}
+
+#script_list {
+    display: flex;
+    gap: 6px;
+}
+
+.card form{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#network_settings, #user_settings {
+    display: flex; 
+    flex-direction: column;
+    gap: 6px
 }

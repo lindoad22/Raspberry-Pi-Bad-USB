@@ -64,6 +64,8 @@ def attack_mode():
     
 
 def config_mode():
+
+    headers = Headers()
     def open_html(path):
         with open(path) as f:
             return f.read()
@@ -87,11 +89,13 @@ def config_mode():
     def index(request: Request):
 
         #request cookies
-        session_ID = request.cookies
-        print(session_ID)
+        session_ID = request.headers.get("Cookie", "")
+        #print(session_ID)
 
         login_username = users["username"]
-        session_ID = {"session_ID":"1"}
+        #session_ID = {"session_ID":"1"}
+
+        message = ""
         if False == bool(session_ID):
             return Redirect(request, "/login")
             pass
@@ -106,6 +110,7 @@ def config_mode():
                 #write user input data to json file
                 #with open("/data/network.json", 'w') as f:
                 #    json.dump(data, f)
+                message="Settings saved"
 
             elif request.method == "GET":
                 #print("NOT POST")
@@ -117,29 +122,46 @@ def config_mode():
                 ssid_value=(ssid),
                 wifi_password_value=(wifi_password),
                 login_username=(login_username),
+                message=(message)
 
             ), content_type="text/html")
     
     #page settings on /login directory
     @server.route("/login", methods=[GET, POST])
     def start(request: Request):
-        session_ID = request.cookies
+        session_ID = request.headers.get("Cookie", "")
 
+        print(session_ID)
         if False == bool(session_ID):
             
-
+            message = ""
             if request.method == "POST":
                 posted_value = request.form_data
                 data = {key: value for key, value in posted_value.items()}
-                print(data)
 
+                login_file = load_json("/data/login.json")
+                if data["username"] == login_file["username"]:
+                    if data['password'] == login_file['password']:
+                        #cookies = {"session_ID": "1"}
+
+                        headers = Headers()
+                        headers.add("Set-Cookie", "session_ID=1; Path=/")
+                        print("headers set")
+                        return Redirect(request, "/",headers=headers)
+                    else:
+                        message = "wrong username or password"
+                        print(message)
+
+                else:
+                        message = "wrong username or password"
+                        print(message)
                 
-
+            
             html_page = open_html("/static/login.html")
-            return Response(request, html_page.format(), content_type="text/html")
+            return Response(request, html_page.format(message=message), content_type="text/html")
         
         else:
-            print("redirect")
+            return Redirect(request, "/")
 
     @server.route("/script_edit", methods=[GET, POST])
     def edit(request: Request):
@@ -149,7 +171,8 @@ def config_mode():
         script_file = load_json("/data/scripts.json")
         script = ""
         sc_id = ""
-            
+        message =""
+
         list_item = open_html("/static/list_item.html")
         for key,value in script_file.items():
 
@@ -182,9 +205,10 @@ def config_mode():
 
                 script_file[get['sc_id']]["script"] = data["script"]
                 print(script_file)
+                message = "Script saved"
 
         html_page = open_html("/static/script_edit.html")
-        return Response(request, html_page.format(script=script, list_item=list_output), content_type="text/html")
+        return Response(request, html_page.format(script=script, list_item=list_output, message=message), content_type="text/html")
     
     @server.route("/logbook", methods=[GET, POST])
     def edit(request: Request):

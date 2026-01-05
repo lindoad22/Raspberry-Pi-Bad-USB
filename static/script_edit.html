@@ -7,24 +7,32 @@
     <title>Script Edit</title>
 </head>
 <body>
-    <div id="menu">
-        <a href="/">Settings</a>
-        <a href="/logbook">logbook</a>
-    </div>
-
     <div id="wrapper">
-        <div id="script_list">
-            {list_item}
+        <div id="menu">
+            <a href="/">Settings</a>
+            <a href="/logbook">logbook</a>
         </div>
-        
-        <div id="edit_script">
-            <form method="POST" enctype="text/plain">
-                <textarea name="script" id="textarea_script">{script}</textarea>
+
+        <div id="script_card">
+            <div id="script_list">
+                {list_item}
+            </div>
+            
+            <div id="edit_script">
+                <form method="POST" enctype="text/plain">
+                    <textarea name="script" id="textarea_script">{script}</textarea>
+                    
+
+                    <div class="button_div">
+                        <button type="submit">send</button>
+                    </div>
+                </form>
                 
-                <button type="submit">send</button>
-            </form>
+                {message}
+            </div>
             
         </div>
+
     </div>
 </body>
 </html>
