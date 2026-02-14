@@ -5,6 +5,12 @@
     font-family: sans-serif;
 }
 
+input {
+    border: 1px solid;
+    padding: 2px;
+    border-radius: 3px;
+}
+
 .log_item {
     display: flex;
     gap: 6px;
@@ -100,6 +106,7 @@ textarea {
 
 #script_list {
     display: flex;
+    flex-direction: column;
     gap: 6px;
 }
 

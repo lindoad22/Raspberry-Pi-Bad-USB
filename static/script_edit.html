@@ -21,7 +21,14 @@
             <div id="edit_script">
                 <form method="POST" enctype="text/plain">
                     <textarea name="script" id="textarea_script">{script}</textarea>
-                    
+                    <div>
+                        <label for="new_script">New Script</label>
+                        <input name="new_script" type="checkbox">
+                    </div>
+                    <div>
+                        <label for="active_script">Active Script</label>
+                        <input name="active_script" type="checkbox">
+                    </div>
 
                     <div class="button_div">
                         <button type="submit">send</button>

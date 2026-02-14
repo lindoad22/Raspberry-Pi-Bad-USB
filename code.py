@@ -12,6 +12,36 @@ from adafruit_hid.keycode import Keycode
 
 from adafruit_httpserver import GET,POST, Request, Response, Server, Headers, Redirect, NOT_FOUND_404, MOVED_PERMANENTLY_301
 
+#sd card imports
+import adafruit_sdcard
+import busio
+import digitalio
+import board
+import storage  
+
+
+# button = digitalio.DigitalInOut(board.GP15)
+# button.switch_to_input(pull=digitalio.Pull.UP)
+# while True:
+#     if button.value == False:
+#         print("pushed")
+#     else:
+#         print("not pushed")
+
+#     time.sleep(0.2)
+
+
+sck = board.GP18
+mosi = board.GP19   
+miso = board.GP16
+cs = digitalio.DigitalInOut(board.GP17)
+
+spi = busio.SPI(sck, mosi, miso)
+
+#mounting SD card
+sdcard = adafruit_sdcard.SDCard(spi, cs)
+vfs = storage.VfsFat(sdcard)
+storage.mount(vfs, "/sd")
 
 def attack_mode():
     #load ducky_script keymap
@@ -61,7 +91,6 @@ def attack_mode():
 
     
     #log attack to file
-    
 
 def config_mode():
 
@@ -71,8 +100,8 @@ def config_mode():
             return f.read()
     
     #laoding data from files
-    network_file = load_json("/data/network.json")
-    users = load_json("/data/login.json")
+    network_file = load_json("/sd/network.json")
+    users = load_json("/sd/login.json")
 
     ssid = network_file["ssid"]
     wifi_password = network_file["wifi_password"]
@@ -108,8 +137,8 @@ def config_mode():
                 data = {key: value for key, value in posted_value.items()}
 
                 #write user input data to json file
-                #with open("/data/network.json", 'w') as f:
-                #    json.dump(data, f)
+                with open("/sd/network.json", 'w') as f:
+                    json.dump(data, f)
                 message="Settings saved"
 
             elif request.method == "GET":
@@ -155,6 +184,7 @@ def config_mode():
                 else:
                         message = "wrong username or password"
                         print(message)
+
                 
             
             html_page = open_html("/static/login.html")
@@ -169,6 +199,8 @@ def config_mode():
 
         list_output = ""
         script_file = load_json("/data/scripts.json")
+        active_script = load_json("/data/active_script.json")
+        active_script_id = active_script['active_script_id']
         script = ""
         sc_id = ""
         message =""
@@ -179,6 +211,7 @@ def config_mode():
             l_item = list_item.format(script_id=key, script_name=value["name"], content_type="text/html")
             list_output = list_output + l_item
 
+        checked = ""
         if request.method == "GET":
 
             get = request.query_params
@@ -186,9 +219,11 @@ def config_mode():
             if len(get) != 0:
 
                 sc_id = get["sc_id"]
+                print(sc_id)
+                print(active_script_id)
 
                 try:
-                    
+
                     script = script_file[sc_id]["script"]
                 except:
                     pass
@@ -208,7 +243,7 @@ def config_mode():
                 message = "Script saved"
 
         html_page = open_html("/static/script_edit.html")
-        return Response(request, html_page.format(script=script, list_item=list_output, message=message), content_type="text/html")
+        return Response(request, html_page.format(checked=checked,script=script, list_item=list_output, message=message), content_type="text/html")
     
     @server.route("/logbook", methods=[GET, POST])
     def edit(request: Request):
