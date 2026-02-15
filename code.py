@@ -4,7 +4,7 @@ import wifi
 import socketpool
 import json
 import ducky_script
-from fce import load_json
+from fce import load_json, write_json_file
 
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
@@ -49,9 +49,9 @@ def attack_mode():
     #print(dictionary)
     
     #loading json file with active script ID
-    active_id = load_json("/data/active_script.json")["active_script_id"]
+    active_id = load_json("/sd/active_script.json")["active_script_id"]
     #loading active attack script from json file
-    active_script = load_json("/data/scripts.json")[active_id]
+    active_script = load_json("/sd/scripts.json")[active_id]
     split_script = active_script["script"].split(",")
 
     #set keyboard
@@ -116,12 +116,16 @@ def config_mode():
     #page settings on root directory
     @server.route("/", methods=[GET, POST])
     def index(request: Request):
+        
+        ssid = load_json('/sd/network.json')
+        ssid = network_file["ssid"]
+        wifi_password = network_file["wifi_password"]
+        login_username = load_json('/sd/login.json')["username"]
 
         #request cookies
         session_ID = request.headers.get("Cookie", "")
         #print(session_ID)
 
-        login_username = users["username"]
         #session_ID = {"session_ID":"1"}
 
         message = ""
@@ -135,11 +139,37 @@ def config_mode():
 
                 #processing form data 
                 data = {key: value for key, value in posted_value.items()}
+                print(data)
 
-                #write user input data to json file
-                with open("/sd/network.json", 'w') as f:
-                    json.dump(data, f)
-                message="Settings saved"
+                login_file = load_json('/sd/login.json')
+
+                #{'login_password': '',
+                # 'confirm_password': '', 'ssid': 'test',
+                #  'username': 'user', 'wifi_password': '12345678'}
+
+                if data['login_password'] != '':
+                    
+                    if data['confirm_password'] == data['login_password']:
+                        pass
+                    else:
+                        message = "passwords don't match"
+                    
+                    
+                else:
+                    login_file['username'] = data['username']
+                    network_file['ssid'] = data['ssid']
+                    network_file['wifi_password'] = data['wifi_password']
+
+                    #write user input data to json files
+                    write_json_file('/sd/network.json', network_file)
+                    write_json_file('/sd/login.json', login_file)
+
+                    #update forms input placeholders
+                    message="Settings saved"
+                    ssid = load_json('/sd/network.json')
+                    ssid = network_file["ssid"]
+                    wifi_password = network_file["wifi_password"]
+                    login_username = load_json('/sd/login.json')["username"]
 
             elif request.method == "GET":
                 #print("NOT POST")
@@ -168,7 +198,7 @@ def config_mode():
                 posted_value = request.form_data
                 data = {key: value for key, value in posted_value.items()}
 
-                login_file = load_json("/data/login.json")
+                login_file = load_json("/sd/login.json")
                 if data["username"] == login_file["username"]:
                     if data['password'] == login_file['password']:
                         #cookies = {"session_ID": "1"}
@@ -198,8 +228,8 @@ def config_mode():
         #session_ID = request.cookies
 
         list_output = ""
-        script_file = load_json("/data/scripts.json")
-        active_script = load_json("/data/active_script.json")
+        script_file = load_json("/sd/scripts.json")
+        active_script = load_json("/sd/active_script.json")
         active_script_id = active_script['active_script_id']
         script = ""
         sc_id = ""
