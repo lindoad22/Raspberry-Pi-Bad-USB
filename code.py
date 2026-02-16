@@ -2,7 +2,6 @@ import time
 import usb_hid
 import wifi
 import socketpool
-import json
 import ducky_script
 from fce import load_json, write_json_file
 
@@ -17,7 +16,7 @@ import adafruit_sdcard
 import busio
 import digitalio
 import board
-import storage  
+import storage
 
 
 
@@ -89,7 +88,8 @@ def attack_mode():
         error = 'syntax error in script'
         status = 'failed'
 
-
+    #file = load_json('/data/logs.json')
+    #write_json_file('/sd/logs.json', file)
     logs_file = load_json('/sd/logs.json')
 
     print(active_script['name'])
@@ -103,6 +103,8 @@ def attack_mode():
     #logs_file = {'logs': [{'reason': '', 'status': 'success', 'script_name': 'test script'}]}
     write_json_file('/sd/logs.json', logs_file)
 
+    time.sleep(0.5)
+
 
 def config_mode():
 
@@ -110,20 +112,15 @@ def config_mode():
     def open_html(path):
         with open(path) as f:
             return f.read()
+        
+    network_data = load_json('/sd/network.json')
+    wifi.radio.start_ap(ssid=network_data['ssid'], password=network_data['wifi_password'])
+    pool = socketpool.SocketPool(wifi.radio)
+    server = Server(pool, "/static", debug=True)
     
     #laoding data from files
     network_file = load_json('/sd/network.json')
     users = load_json('/sd/login.json')
-
-    ssid = network_file['ssid']
-    wifi_password = network_file['wifi_password']
-
-    print('creating AP')
-    #time.sleep(3)
-    wifi.radio.start_ap(ssid=ssid, password=wifi_password)
-
-    pool = socketpool.SocketPool(wifi.radio)
-    server = Server(pool, '/static', debug=True)
 
     #page settings on root directory
     @server.route('/', methods=[GET, POST])
@@ -336,8 +333,6 @@ def config_mode():
 
                     l_item = list_item.format(script_id=key, script_name=value['name'], content_type='text/html')
                     list_output = list_output + l_item
-                #script_file[get['sc_id']]['script'] = data['script']
-                #print(script_file)
 
         html_page = open_html('/static/script_edit.html')
         return Response(request, html_page.format(
@@ -349,6 +344,7 @@ def config_mode():
             sc_id = sc_id
             ), content_type='text/html')
     
+    #logbook page setup
     @server.route('/logbook', methods=[GET, POST])
     def edit(request: Request):
 
@@ -375,18 +371,39 @@ def config_mode():
     server.serve_forever(str(wifi.radio.ipv4_address_ap))
 
 
-#attack_mode()
-config_mode()
+attack = 1
+config = 0
 
+button = digitalio.DigitalInOut(board.GP15)
+button.switch_to_input(pull=digitalio.Pull.UP)
 
-# attack = 0
-# config = 1
-
-# button = digitalio.DigitalInOut(board.GP15)
-# button.switch_to_input(pull=digitalio.Pull.UP)
-
-# current_mode = attack
-# last_button_state = button.value
+current_mode = attack
+switch_modes = True
+last_button_state = button.value
+debounce_time = 0.05
 
 while True:
-    time.sleep(1)
+    current = button.value
+    
+    if current != last_button_state:
+        time.sleep(debounce_time)
+        
+        if button.value == current:
+
+            if last_button_state == True and current == False:
+
+                current_mode = config if current_mode == attack else attack
+                switch_modes = True
+            
+            last_button_state = current
+
+    if switch_modes:
+        if current_mode == attack:
+            attack_mode()
+            
+        else:
+            config_mode()
+
+        switch_modes = False
+
+    time.sleep(0.01)
