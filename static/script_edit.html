@@ -20,6 +20,10 @@
             
             <div id="edit_script">
                 <form method="POST" enctype="text/plain">
+                    <div>
+                        <label for="name">Script Name</label>
+                        <input name="name" type="text" value="{script_name}">
+                    </div>
                     <textarea name="script" id="textarea_script">{script}</textarea>
                     <div>
                         <label for="new_script">New Script</label>
@@ -27,8 +31,15 @@
                     </div>
                     <div>
                         <label for="active_script">Active Script</label>
-                        <input name="active_script" type="checkbox">
+                        <input name="active_script" type="checkbox" {check}>
                     </div>
+
+                    <div>
+                        <label for="delete_script">Delete</label>
+                        <input name="delete_script" type="checkbox">
+                    </div>
+
+                    <input name="script_id" type="hidden" value="{sc_id}">
 
                     <div class="button_div">
                         <button type="submit">send</button>
