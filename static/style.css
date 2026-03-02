@@ -11,14 +11,14 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    background: #f5f5f5;
+    background: #F3F5F9;
 }
 
 #wrapper {
     margin: 20px;
     padding: 16px;
     width: 100%;
-    max-width: 950px;
+    max-width: 900px;
     
     background: white;
 
@@ -33,22 +33,23 @@ body {
 #menu {
     display: flex;
     gap: 8px;
-    padding-bottom: 8px;
     border-bottom: 1px solid #ccc;
 }
 
 #menu a {
-    border: 1px solid #aaa;
     padding: 6px 12px;
 
     text-decoration: none;
-    color: black;
-    border-radius: 4px;
-    background: #f0f0f0;
+    color: #a9a8a8;
+}
+
+.active {
+    border-bottom: 4px solid #3B55A5;
+    color: #3B55A5 !important;
 }
 
 #menu a:hover {
-    background: #e0e0e0;
+    color: #3B55A5;
 }
 
 
@@ -73,7 +74,6 @@ body {
 }
 
 #edit_script {
-    border: 1px solid #ccc;
     border-radius: 6px;
     padding: 12px;
     
@@ -83,6 +83,15 @@ body {
     gap: 12px;
 }
 
+.list_item a {
+    text-decoration: none;
+    color: #353535;
+}
+
+.list_item a:hover {
+    text-decoration: underline;
+}
+
 
 form {
     display: flex;
@@ -90,15 +99,30 @@ form {
     gap: 12px;
 }
 
-form div {
+.input_field {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    align-items: center;
+
+    padding-bottom: 8px;
 }
 
+.input_field label {
+    width: 150px;
+}
 
-input[type="text"], textarea {
-    border: 1px solid #aaa;
+.input_field input {
+    flex: 0.5;
+}
+
+.divider {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    margin: 16px 0;
+}
+
+input[type="text"], textarea, input[type="password"] {
+    border: 1px solid #d7d7d7;
     border-radius: 4px;
     padding: 6px;
 
@@ -107,7 +131,7 @@ input[type="text"], textarea {
 
 textarea {
     min-height: 180px;
-    resize: vertical;
+    max-width: 550px;
 }
 
 
@@ -117,29 +141,39 @@ input[type="checkbox"] {
 
 .button_div {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 button {
+    border: 1px solid transparent;
     padding: 8px 18px;
-    border: 1px solid #aaa;
     border-radius: 4px;
-    background: #f0f0f0;
-    
+    background: #3B55A5;
+    color : white;
     
     font-size: 14px;
     cursor: pointer;
 }
 
 button:hover {
-    background: #e0e0e0;
+    background: white;
+    color: #3B55A5;
+    border: 1px solid #3B55A5;
 }
 
 
-#edit_script p {
-    border-top: 1px solid #ddd;
-    padding-top: 8px;
-    font-size: 14px;
+#login_form {
+
+    padding: 16px;
+    border-radius: 6px;
+
+    display: flex;
+    justify-self: center;
+    align-self: center;
+
+    background-color: white;
+
+    box-shadow: #ccc 10px 10px 20px;
 }
 
 
@@ -158,25 +192,23 @@ button:hover {
     border-bottom: 1px solid #ddd;
     padding: 8px 10px;
 
-    display: grid;
-    grid-template-columns: 60px 90px 1fr 1fr;
+    display: flex;
+    justify-content: space-between;
     gap: 8px;
     align-items: center;
     font-size: 14px;
 }
 
-#logs .log_item:first-child {
+#logs .first_log {
     font-weight: bold;
-    background: #f0f0f0;
-    border-bottom: 2px solid #bbb;
+    border-bottom: 2px solid #ababab;
 }
 
-#logs .log_item:not(:first-child):hover {
-    background: #f7f7f7;
+#logs .log_item:hover {
+    background: #f6f6f6;
 }
 
 .cell {
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    width: 25%;
 }

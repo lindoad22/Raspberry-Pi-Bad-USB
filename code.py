@@ -30,9 +30,6 @@ switch_modes = True
 last_button_state = button.value
 debounce_time = 0.05
 
-#hash
-#a8f8ff335240846d11021cd094bab5c8a2ffb0d651cff3378a04b6796b61633b
-
 while True:
     current = button.value
     
@@ -52,7 +49,7 @@ while True:
         if current_mode == attack:
             print("Switched to attack mode")
             #attack_mode()
-
+            
 
         else:
             print("Switched to config mode")

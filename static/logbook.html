@@ -11,18 +11,19 @@
 
         <div id="menu">
                 <a href="/script_edit">edit scripts</a>
-                <a href="/logbook">see logs</a>
+                <a class="active" href="/logbook">see logs</a>
                 <a href="/">settings</a>
             </div>
     
         <div id="logs">
-            <div class="log_item">
+            <div class="log_item first_log">
                 <div class="cell">ID</div>
                 <div class="cell">Status</div>
                 <div class="cell">Error</div>
                 <div class="cell">Script name</div>
             </div>
             {logbook_item}
+            
         </div>
     </div>
 </body>

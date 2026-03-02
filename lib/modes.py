@@ -6,7 +6,8 @@ import ducky_script
 from fce import load_json, write_json_file, write_to_csv, read_csv_logs, open_html
 
 from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+#from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from layout_cz import KeyboardLayout
 from adafruit_hid.keycode import Keycode
 
 from adafruit_httpserver import GET,POST, Request, Response, Server, Headers, Redirect, NOT_FOUND_404, MOVED_PERMANENTLY_301
@@ -23,7 +24,7 @@ def attack_mode():
     split_script = active_script['script'].split(',')
     #set keyboard
     kbd = Keyboard(usb_hid.devices)
-    layout = KeyboardLayoutUS(kbd)
+    layout = KeyboardLayout(kbd)
 
     error = ''
     status = ''

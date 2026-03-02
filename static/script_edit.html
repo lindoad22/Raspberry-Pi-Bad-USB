@@ -9,12 +9,18 @@
 <body>
     <div id="wrapper">
         <div id="menu">
-            <a href="/">Settings</a>
-            <a href="/logbook">logbook</a>
-        </div>
+                <a class="active" href="/script_edit">edit scripts</a>
+                <a href="/logbook">see logs</a>
+                <a href="/">settings</a>
+            </div>
 
         <div id="script_card">
+            
             <div id="script_list">
+                <div id="script_header">
+                    <h2>Payloads</h2>
+                    <div class="divider"></div>
+                </div>
                 {list_item}
             </div>
             
@@ -40,7 +46,8 @@
                     </div>
 
                     <input name="script_id" type="hidden" value="{sc_id}">
-
+                    
+                    <div class="divider"></div>
                     <div class="button_div">
                         <button type="submit">send</button>
                     </div>
