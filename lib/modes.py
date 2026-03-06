@@ -1,9 +1,10 @@
+import json
 import time
 import usb_hid
 import wifi
 import socketpool
 import ducky_script
-from fce import load_json, write_json_file, write_to_csv, read_csv_logs, open_html
+from fce import load_json, write_json_file, write_to_csv, read_csv_logs, open_html, url_decode
 
 from adafruit_hid.keyboard import Keyboard
 from layout_cz import KeyboardLayout
@@ -223,64 +224,64 @@ def config_mode():
             
             if len(get) != 0:
 
-                data = {key: value for key, value in posted_value.items()}
+                data_endcoded = {key: value for key, value in posted_value.items()}
+                data = {}
 
+                #decoding url encoded form data
+                data['script'] = url_decode(data_endcoded.get('script', ''))
+                data['script_id'] = url_decode(data_endcoded.get('script_id', ''))
+                data['name'] = url_decode(data_endcoded.get('name', ''))
+                data['delete_script'] = url_decode(data_endcoded.get('delete_script', 'off'))
+                data['active_script'] = url_decode(data_endcoded.get('active_script', 'off'))
+                data['new_script'] = url_decode(data_endcoded.get('new_script', 'off'))
 
-                if 'delete_script' in data:
-                    if data['delete_script'] == 'on':
+                if data['delete_script'] == 'on':
+                    script_file = load_json('/sd/scripts.json')
 
-                        script_file = load_json('/sd/scripts.json')
+                    delete_id = str(data['script_id'])
 
-                        delete_id = str(data['script_id'])
-
-                        if delete_id in script_file:
-                            del script_file[delete_id]
-
-                            write_json_file('/sd/scripts.json', script_file)
-                        else:
-                            message = 'Script not found'
-
+                    if delete_id in script_file:
+                        del script_file[delete_id]
+                        write_json_file('/sd/scripts.json', script_file)
                         message = 'Script deleted'
+                    else:
+                        message = 'Script not found'
 
-                elif 'active_script' in data:
-                    if data['active_script'] == 'on':
-                        active_script_id = str(data['script_id'])
-                        active_script['active_script_id'] = active_script_id
+                elif data['active_script'] == 'on':
+                    active_script_id = str(data['script_id'])
+                    active_script['active_script_id'] = active_script_id
+                    write_json_file('/sd/active_script.json', active_script)
 
-                        write_json_file('/sd/active_script.json', active_script)
-
-                        script_id = data['script_id']
-                        script_file[script_id] = {'name': data['name'],
-                                            'script': data['script']
-                                            }
-
-                        write_json_file('/sd/scripts.json', script_file)
-
-                        message = 'Script saved'
-
-                elif 'new_script' in data:
-                    if data['new_script'] == 'on':
-                        script_file = load_json('/sd/scripts.json')
-                        ids = [int(k) for k in script_file.keys()]
-                        new_id = str(max(ids) + 1)
-
-                        script_file[new_id] = {'name': data['name'],
-                                               'script': data['script']
-                                               }
-
-                        write_json_file('/sd/scripts.json', script_file)
-
-                        message = 'Script saved'
-                else:
-                    
                     script_id = str(data['script_id'])
-                    script_file[script_id] = {'name': data['name'],
-                                            'script': data['script']
-                                            }
-
-
+                    script_file[script_id] = {
+                        'name': data['name'],
+                        'script': data['script']
+                    }
                     write_json_file('/sd/scripts.json', script_file)
 
+                    message = 'Script saved'
+
+                elif data['new_script'] == 'on':
+                    script_file = load_json('/sd/scripts.json')
+                    ids = [int(k) for k in script_file.keys()] if len(script_file) != 0 else [0]
+                    new_id = str(max(ids) + 1)
+
+                    script_file[new_id] = {
+                        'name': data['name'],
+                        'script': data['script']
+                    }
+
+                    write_json_file('/sd/scripts.json', script_file)
+                    message = 'Script saved'
+
+                else:
+                    script_id = str(data['script_id'])
+                    script_file[script_id] = {
+                        'name': data['name'],
+                        'script': data['script']
+                    }
+
+                    write_json_file('/sd/scripts.json', script_file)
                     message = 'Script saved'
 
 
@@ -330,6 +331,7 @@ def config_mode():
         return Response(request, html_page.format(logbook_item=list_output), content_type='text/html')
 
     server.start(str(wifi.radio.ipv4_address_ap))
+    server.request_buffer_size = 4096
 
 
 def stop_server():

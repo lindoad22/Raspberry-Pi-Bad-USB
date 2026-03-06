@@ -59,7 +59,7 @@ while True:
 
             #print("Switched to attack mode")
             led.value = False
-            #attack_mode()
+            attack_mode()
 
         else:
             #print("Switched to config mode")

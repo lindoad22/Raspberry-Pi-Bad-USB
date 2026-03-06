@@ -25,13 +25,13 @@
             </div>
             
             <div id="edit_script">
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="application/x-www-form-urlencoded">
 
                     <div>
                         <label for="name">Script Name</label>
-                        <input name="name" type="text" value="{script_name}">
+                        <input id="name" name="name" type="text" value="{script_name}">
                     </div>
-                    <textarea name="script" id="textarea_script">{script}</textarea>
+                    <textarea id="script" name="script" id="textarea_script">{script}</textarea>
                     <div>
                         <label for="new_script">New Script</label>
                         <input name="new_script" type="checkbox">
@@ -46,7 +46,7 @@
                         <input name="delete_script" type="checkbox">
                     </div>
 
-                    <input name="script_id" type="hidden" value="{sc_id}">
+                    <input id="script_id" name="script_id" type="hidden" value="{sc_id}">
                     
                     <div class="divider"></div>
                     <div class="button_div">
@@ -60,5 +60,6 @@
         </div>
 
     </div>
+
 </body>
 </html>
