@@ -1,5 +1,5 @@
 import time
-from modes import attack_mode, config_mode
+from modes import attack_mode, config_mode, check_server, stop_server
 
 #sd card imports
 import adafruit_sdcard
@@ -25,10 +25,14 @@ config = 0
 button = digitalio.DigitalInOut(board.GP15)
 button.switch_to_input(pull=digitalio.Pull.UP)
 
+led = digitalio.DigitalInOut(board.LED)
+led.direction = digitalio.Direction.OUTPUT
+
 current_mode = attack
 switch_modes = True
 last_button_state = button.value
 debounce_time = 0.05
+
 
 while True:
     current = button.value
@@ -47,14 +51,29 @@ while True:
 
     if switch_modes:
         if current_mode == attack:
-            print("Switched to attack mode")
-            #attack_mode()
             
+            try:
+                stop_server()
+            except:
+                pass
+
+            #print("Switched to attack mode")
+            led.value = False
+            #attack_mode()
 
         else:
-            print("Switched to config mode")
+            #print("Switched to config mode")
+            led.value = True
             config_mode()
+            
 
         switch_modes = False
 
-    time.sleep(0.01)
+    if current_mode == config:
+
+        try:
+            check_server()
+        except:
+            pass
+
+    time.sleep(0.1)

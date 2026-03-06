@@ -6,22 +6,21 @@ import ducky_script
 from fce import load_json, write_json_file, write_to_csv, read_csv_logs, open_html
 
 from adafruit_hid.keyboard import Keyboard
-#from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from layout_cz import KeyboardLayout
 from adafruit_hid.keycode import Keycode
 
+import adafruit_httpserver
 from adafruit_httpserver import GET,POST, Request, Response, Server, Headers, Redirect, NOT_FOUND_404, MOVED_PERMANENTLY_301
 
 def attack_mode():
     #load ducky_script keymap
     dictionary = ducky_script.get_dict()
-    #print(dictionary)
     
     #loading json file with active script ID
     active_id = load_json('/sd/active_script.json')['active_script_id']
     #loading active attack script from json file
     active_script = load_json('/sd/scripts.json')[active_id]
-    split_script = active_script['script'].split(',')
+    split_script = active_script['script'].split(';;')
     #set keyboard
     kbd = Keyboard(usb_hid.devices)
     layout = KeyboardLayout(kbd)
@@ -41,19 +40,19 @@ def attack_mode():
                     #print(key)
                     
                     kbd.press(key)
-                    print('pressing')
+                    #print('pressing')
 
 
                 time.sleep(0.2)
                 kbd.release_all()
-                print('keys released')
+                #print('keys released')
 
-            elif '[' in i and ']' in i:
-                layout.write(i[1:-1])
-                print('writing')
+            elif i.startswith('TEXT '):
+                layout.write(i[5:])
+                #print('writing')
 
-            elif 'WAIT' in i:
-                t = i[4:]
+            elif i.startswith('WAIT '):
+                t = i[5:]
                 time.sleep(float(t))
 
             else:
@@ -71,10 +70,9 @@ def attack_mode():
 
     write_to_csv('/sd/logs.csv', status, error, active_script['name'])
 
-    time.sleep(0.5)
-
 
 def config_mode():
+    global server, pool
     headers = Headers()
         
     network_file = load_json('/sd/network.json')
@@ -82,13 +80,13 @@ def config_mode():
     wifi.radio.start_ap(ssid=network_file['ssid'], password=network_file['wifi_password'])
     pool = socketpool.SocketPool(wifi.radio)
     server = Server(pool, "/static", debug=True)
+
     
     #page settings on root directory
     @server.route('/', methods=[GET, POST])
     def index(request: Request):
         
-        #network_file = load_json('/sd/network.json')
-        print("Request received at /")
+        #print("Request received at /")
         ssid = network_file['ssid']
         wifi_password = network_file['wifi_password']
 
@@ -96,13 +94,11 @@ def config_mode():
 
         #request cookies
         cookie_header = request.headers.get('Cookie', '')
-        print(cookie_header)
-
-        #session_ID = {'session_ID':'1'}
+        #print(cookie_header)
 
         message = ''
         if "session_ID=1" not in cookie_header:
-            print('No valid session, redirecting to login')
+            #print('No valid session, redirecting to login')
             return Redirect(request, '/login')         
         else:
 
@@ -111,12 +107,8 @@ def config_mode():
 
                 #processing form data 
                 data = {key: value for key, value in posted_value.items()}
-                print(data)
-
-                #login_file = load_json('/sd/login.json')
 
                 if data['login_password'] != '':
-                    print('Changing password')
                     if data['confirm_password'] == data['login_password']:
                         login_file['password'] = data['login_password']
                     else:
@@ -157,7 +149,6 @@ def config_mode():
     def start(request: Request):
         session_ID = request.headers.get('Cookie', '')
 
-        print(session_ID)
         if False == bool(session_ID):
             
             message = ''
@@ -165,22 +156,20 @@ def config_mode():
                 posted_value = request.form_data
                 data = {key: value for key, value in posted_value.items()}
 
-                #login_file = load_json('/sd/login.json')
                 if data['username'] == login_file['username']:
                     if data['password'] == login_file['password']:
-                        #cookies = {'session_ID': '1'}
 
                         headers = Headers()
                         headers.add('Set-Cookie', 'session_ID=1; Path=/')
-                        print('headers set')
+                        #print('headers set')
                         return Redirect(request, '/',headers=headers)
                     else:
                         message = 'wrong username or password'
-                        print(message)
+                        #print(message)
 
                 else:
                         message = 'wrong username or password'
-                        print(message)
+                        #print(message)
 
                 
             
@@ -188,7 +177,7 @@ def config_mode():
             return Response(request, html_page.format(message=message), content_type='text/html')
         
         else:
-            print('Valid session, redirecting to settings')
+            #Valid session, redirecting to settings
             return Redirect(request, '/')
 
     @server.route('/script_edit', methods=[GET, POST])
@@ -218,8 +207,6 @@ def config_mode():
             if len(get) != 0:
 
                 sc_id = get['sc_id']
-                print(sc_id)
-                print(active_script_id)
 
                 try:
 
@@ -237,8 +224,7 @@ def config_mode():
             if len(get) != 0:
 
                 data = {key: value for key, value in posted_value.items()}
-                print(data)
-                #print(get['sc_id'])
+
 
                 if 'delete_script' in data:
                     if data['delete_script'] == 'on':
@@ -252,7 +238,7 @@ def config_mode():
 
                             write_json_file('/sd/scripts.json', script_file)
                         else:
-                            print("Script not found")
+                            message = 'Script not found'
 
                         message = 'Script deleted'
 
@@ -260,9 +246,16 @@ def config_mode():
                     if data['active_script'] == 'on':
                         active_script_id = str(data['script_id'])
                         active_script['active_script_id'] = active_script_id
-                        #print(active_script)
 
                         write_json_file('/sd/active_script.json', active_script)
+
+                        script_id = data['script_id']
+                        script_file[script_id] = {'name': data['name'],
+                                            'script': data['script']
+                                            }
+
+                        write_json_file('/sd/scripts.json', script_file)
+
                         message = 'Script saved'
 
                 elif 'new_script' in data:
@@ -271,15 +264,25 @@ def config_mode():
                         ids = [int(k) for k in script_file.keys()]
                         new_id = str(max(ids) + 1)
 
-                        #print(type(new_id))
                         script_file[new_id] = {'name': data['name'],
                                                'script': data['script']
                                                }
 
-                        #print(script_file)
                         write_json_file('/sd/scripts.json', script_file)
 
                         message = 'Script saved'
+                else:
+                    
+                    script_id = str(data['script_id'])
+                    script_file[script_id] = {'name': data['name'],
+                                            'script': data['script']
+                                            }
+
+
+                    write_json_file('/sd/scripts.json', script_file)
+
+                    message = 'Script saved'
+
 
                         
                 script_file = load_json('/sd/scripts.json')
@@ -311,13 +314,11 @@ def config_mode():
         
         log_file = read_csv_logs('sd/logs.csv')
         log_file.reverse()
-        print(log_file)
         list_item = open_html('/static/log_item.html')
         list_output = ''
         
         id_counter = len(log_file) - 1
         for i in log_file:
-            print(i)
 
             
             l_item = list_item.format(id=id_counter, status=i['status'], error=i['error'],script_name=i['script_name'], content_type='text/html')
@@ -328,5 +329,27 @@ def config_mode():
         
         return Response(request, html_page.format(logbook_item=list_output), content_type='text/html')
 
-    print("Starting server...")
-    server.serve_forever(str(wifi.radio.ipv4_address_ap))
+    server.start(str(wifi.radio.ipv4_address_ap))
+
+
+def stop_server():
+    global server, pool
+    if server == None:
+        return
+    else:
+        try:
+            server.stop()
+            pool.close()
+
+            pool = None
+            server = None
+        except:
+            pass   
+
+def check_server():
+    global server, pool
+
+    if server == None:
+        return
+    else:
+        server.poll()
